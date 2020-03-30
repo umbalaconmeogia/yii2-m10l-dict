@@ -1,0 +1,17 @@
+{
+    "name": "umbalaconmeogia/yii2-m10l-dict",
+	"type": "yii2-extension",
+	"description": "Module to add dictionary function.",
+    "authors": [
+        {
+            "name": "Tran Trung Thanh",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {"umbalaconmeogia\\m10ldict\\": "src/"}
+    },
+	"keywords": ["yii2", "multilingual", "dictionary"],
+	"license": "MIT"
+}
