@@ -11,6 +11,8 @@ use Yii;
  * @property int|null $dict_id
  * @property string $code
  * @property string $name
+ * 
+ * @property Translation[] $translations
  */
 class Language extends \yii\db\ActiveRecord
 {
@@ -45,5 +47,23 @@ class Language extends \yii\db\ActiveRecord
             'code' => 'Code',
             'name' => 'Name',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTranslations()
+    {
+        return $this->hasMany(Translation::class, ['term_id' => 'id']);
+    }
+
+    /**
+     * Delete all relative Translation when delete a Language.
+     * {@inheritdoc}
+     */
+    public function delete()
+    {
+        Translation::deleteAll('language_id = :languageId', ['languageId' => $this->id]);
+        return parent::delete();
     }
 }

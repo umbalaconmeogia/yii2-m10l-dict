@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'buttons' => [
                     'term' => function ($url, $model) {
                         return Html::a('<span class="glyphicon glyphicon-list-alt"></span>',
-                            ['term/index', 'dict_id' => $model->id],
+                            ['term/index', 'TermSearch[dict_id]' => $model->id],
                             [
                                 'title' => Yii::t('app', 'Term'),
                             ]

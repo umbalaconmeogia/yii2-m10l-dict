@@ -16,9 +16,9 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Term', ['term/index', 'dict_id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Language', ['language/index', 'dict_id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Language', ['language/index', 'LanguageSearch[dict_id]' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Delete', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [

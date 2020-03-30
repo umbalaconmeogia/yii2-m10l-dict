@@ -33,7 +33,7 @@ class LanguageController extends Controller
      * Lists all Language models.
      * @return mixed
      */
-    public function actionIndex($dict_id)
+    public function actionIndex()
     {
         $searchModel = new LanguageSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -65,9 +65,10 @@ class LanguageController extends Controller
     public function actionCreate()
     {
         $model = new Language();
+        $model->load(Yii::$app->request->get());
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index', 'LanguageSearch[dict_id]' => $model->dict_id]);
         }
 
         return $this->render('create', [
@@ -87,7 +88,7 @@ class LanguageController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index', 'LanguageSearch[dict_id]' => $model->dict_id]);
         }
 
         return $this->render('update', [
@@ -104,9 +105,10 @@ class LanguageController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $model->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index', 'LanguageSearch[dict_id]' => $model->dict_id]);
     }
 
     /**
