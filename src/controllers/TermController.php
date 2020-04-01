@@ -48,7 +48,12 @@ class TermController extends BaseController
     public function actionCreate()
     {
         $model = new Term();
-        $model->load(Yii::$app->request->get());
+
+        // Set dict_id (need to set it here to genearte validation rules for translation_xxx)
+        $term = Yii::$app->request->get('Term');
+        if (isset($term['dict_id'])) {
+            $model->dict_id = $term['dict_id'];
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index', 'TermSearch[dict_id]' => $model->dict_id]);

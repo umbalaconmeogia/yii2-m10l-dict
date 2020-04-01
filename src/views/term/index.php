@@ -29,7 +29,7 @@ $columns[] = [
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Term', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Term', ['create', 'Term[dict_id]' => $searchModel->dict_id], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([

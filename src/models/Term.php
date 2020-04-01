@@ -113,15 +113,26 @@ class Term extends BaseModel
     }
 
     /**
+     * @var Translation[]
+     */
+    private $temporaryTranslations = [];
+
+    /**
      * Set translation object specified by langauge id.
      * @param int $languageId
      * @param mixed $value
      */
     public function setTranslationOf($languageId, $value)
     {
-        $translation = Translation::findOneCreateNew(['term_id' => $this->id, 'language_id' => $languageId], FALSE);
-        $translation->attributes = $value;
-        $translation->save();
+        if ($this->id) {
+            $translation = Translation::findOneCreateNew(['term_id' => $this->id, 'language_id' => $languageId], FALSE);
+            $translation->attributes = $value;
+            $translation->save();    
+        } else {
+            $translation = new Translation();
+            $translation->attributes = $value;
+            $this->temporaryTranslations[$languageId] = $translation;
+        }
     }
 
     /**
@@ -147,11 +158,15 @@ class Term extends BaseModel
     }
 
     /**
-     * @param Language $language
+     * Get translation attribute name of specified langauge (translation_<languageId>)
+     * @param int|Language $language
      * @return string
      */
-    public static function translationAttributeOf(Language $language)
+    public static function translationAttributeOf($language)
     {
+        if (is_integer($language)) {
+            $language = Language::findOne($language);
+        }
         return join('', [self::TRANSLATION_ATTR_PREFIX, $language->id]);
     }
 
@@ -168,6 +183,11 @@ class Term extends BaseModel
         }
     }
 
+    /**
+     * Set value to a translation.
+     * @param string $name
+     * @param array $value (attributes of Translation object)
+     */
     private function translationSetter($name, $value)
     {
         $nameParts = explode(self::TRANSLATION_ATTR_DELIMITER, $name);
@@ -175,5 +195,22 @@ class Term extends BaseModel
             throw new Exception("Invalid property name \"$name\"");
         }
         return $this->setTranslationOf($nameParts[1], $value);
+    }
+
+    /**
+     * Save translations when creating new.
+     * {@inheritdoc}
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if ($insert) {
+            foreach ($this->temporaryTranslations as $languageId => $translation) {
+                $translation->language_id = $languageId;
+                $translation->term_id = $this->id;
+                $translation->save();
+            }
+        }
     }
 }
