@@ -39,7 +39,7 @@ class TermSearch extends Term
      */
     public function search($params)
     {
-        $query = Term::find();
+        $query = Term::find()->with('translations');
 
         // add conditions that should always apply here
 

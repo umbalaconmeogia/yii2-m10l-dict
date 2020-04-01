@@ -5,30 +5,13 @@ namespace umbalaconmeogia\m10ldict\controllers;
 use Yii;
 use umbalaconmeogia\m10ldict\models\Language;
 use umbalaconmeogia\m10ldict\models\LanguageSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * LanguageController implements the CRUD actions for Language model.
  */
-class LanguageController extends Controller
+class LanguageController extends BaseController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-
     /**
      * Lists all Language models.
      * @return mixed

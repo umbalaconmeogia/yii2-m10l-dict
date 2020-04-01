@@ -5,30 +5,13 @@ namespace umbalaconmeogia\m10ldict\controllers;
 use Yii;
 use umbalaconmeogia\m10ldict\models\Term;
 use umbalaconmeogia\m10ldict\models\TermSearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * TermController implements the CRUD actions for Term model.
  */
-class TermController extends Controller
+class TermController extends BaseController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-
     /**
      * Lists all Term models.
      * @return mixed
@@ -65,9 +48,10 @@ class TermController extends Controller
     public function actionCreate()
     {
         $model = new Term();
+        $model->load(Yii::$app->request->get());
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index', 'TermSearch[dict_id]' => $model->dict_id]);
         }
 
         return $this->render('create', [
@@ -87,7 +71,7 @@ class TermController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index', 'TermSearch[dict_id]' => $model->dict_id]);
         }
 
         return $this->render('update', [
@@ -104,9 +88,10 @@ class TermController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $model->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index', 'TermSearch[dict_id]' => $model->dict_id]);
     }
 
     /**

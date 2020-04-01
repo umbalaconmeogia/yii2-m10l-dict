@@ -2,7 +2,9 @@
 
 namespace umbalaconmeogia\m10ldict\models;
 
+use Exception;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "m10l_dict_term".
@@ -11,9 +13,13 @@ use Yii;
  * @property int $dict_id
  * 
  * @property Translation[] $translations
+ * @property Dictionary $dictionary
  */
-class Term extends \yii\db\ActiveRecord
+class Term extends BaseModel
 {
+    const TRANSLATION_ATTR_DELIMITER = '_';
+    const TRANSLATION_ATTR_PREFIX = 'translation' . self::TRANSLATION_ATTR_DELIMITER;
+ 
     /**
      * {@inheritdoc}
      */
@@ -29,6 +35,7 @@ class Term extends \yii\db\ActiveRecord
     {
         return [
             [['dict_id'], 'integer'],
+            [$this->translationAttributes(), 'safe'],
         ];
     }
 
@@ -37,10 +44,31 @@ class Term extends \yii\db\ActiveRecord
      */
     public function attributeLabels()
     {
-        return [
+        $translationLabels = [];
+        if ($this->dictionary) {
+            foreach ($this->dictionary->languages as $language) {
+                $translationLabels[self::translationAttributeOf($language)] = $language->name;
+            }    
+        }
+        return array_merge($translationLabels, [
             'id' => 'ID',
             'dict_id' => 'Dict ID',
-        ];
+        ]);
+    }
+
+    /**
+     * Get list attribute "translation_xxx"
+     * @return string[]
+     */
+    public function translationAttributes()
+    {
+        $attributes = [];
+        if ($this->dictionary) {
+            foreach ($this->dictionary->languages as $language) {
+                $attributes[] = self::translationAttributeOf($language);
+            }    
+        }
+        return $attributes;
     }
 
     /**
@@ -52,6 +80,14 @@ class Term extends \yii\db\ActiveRecord
     }
 
     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDictionary()
+    {
+        return $this->hasOne(Dictionary::class, ['id' => 'dict_id']);
+    }
+
+    /**
      * Delete all relative Translation when delete a Term.
      * {@inheritdoc}
      */
@@ -59,5 +95,85 @@ class Term extends \yii\db\ActiveRecord
     {
         Translation::deleteAll('term_id = :termId', ['termId' => $this->id]);
         return parent::delete();
+    }
+
+    private $translationOfLanguages = FALSE;
+
+    /**
+     * Get translation object specified by langauge id.
+     * @param int $languageId
+     * @return Translation
+     */
+    public function getTranslationOf($languageId)
+    {
+        if ($this->translationOfLanguages === FALSE) {
+            $this->translationOfLanguages = self::hashModels($this->translations, 'language_id');
+        }
+        return $this->translationOfLanguages[$languageId];
+    }
+
+    /**
+     * Set translation object specified by langauge id.
+     * @param int $languageId
+     * @param mixed $value
+     */
+    public function setTranslationOf($languageId, $value)
+    {
+        $translation = Translation::findOneCreateNew(['term_id' => $this->id, 'language_id' => $languageId], FALSE);
+        $translation->attributes = $value;
+        $translation->save();
+    }
+
+    /**
+     * Override getter to cope with translation.
+     * {@inheritdoc}
+     */
+    public function __get($name)
+    {
+        return strpos($name, self::TRANSLATION_ATTR_PREFIX) === 0 ? $this->translationGetter($name) : parent::__get($name);
+    }
+
+    /**
+     * @param string $name Pattern translation_<languageId>
+     * @return Translation
+     */
+    private function translationGetter($name)
+    {
+        $nameParts = explode(self::TRANSLATION_ATTR_DELIMITER, $name);
+        if (!isset($nameParts[1])) {
+            throw new Exception("Invalid property name \"$name\"");
+        }
+        return $this->getTranslationOf($nameParts[1]);
+    }
+
+    /**
+     * @param Language $language
+     * @return string
+     */
+    public static function translationAttributeOf(Language $language)
+    {
+        return join('', [self::TRANSLATION_ATTR_PREFIX, $language->id]);
+    }
+
+    /**
+     * Override getter to cope with translation.
+     * {@inheritdoc}
+     */
+    public function __set($name, $value)
+    {
+        if (strpos($name, self::TRANSLATION_ATTR_PREFIX) === 0) {
+            $this->translationSetter($name, $value);
+        } else {
+            parent::__set($name, $value);
+        }
+    }
+
+    private function translationSetter($name, $value)
+    {
+        $nameParts = explode(self::TRANSLATION_ATTR_DELIMITER, $name);
+        if (!isset($nameParts[1])) {
+            throw new Exception("Invalid property name \"$name\"");
+        }
+        return $this->setTranslationOf($nameParts[1], $value);
     }
 }

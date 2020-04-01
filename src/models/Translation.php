@@ -2,8 +2,6 @@
 
 namespace umbalaconmeogia\m10ldict\models;
 
-use Yii;
-
 /**
  * This is the model class for table "m10l_dict_translation".
  *
@@ -13,7 +11,7 @@ use Yii;
  * @property string|null $translation
  * @property string|null $pronunciation
  */
-class Translation extends \yii\db\ActiveRecord
+class Translation extends BaseModel
 {
     /**
      * {@inheritdoc}

@@ -1,5 +1,6 @@
 <?php
 
+use umbalaconmeogia\m10ldict\models\Term;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -9,6 +10,19 @@ use yii\grid\GridView;
 
 $this->title = 'Terms';
 $this->params['breadcrumbs'][] = $this->title;
+$this->params['fluid'] = TRUE;
+$columns = [];
+
+foreach ($searchModel->dictionary->languages as $language) {
+    $columns[] = [
+        'header' => $language->name,
+        'attribute' => Term::translationAttributeOf($language) . '.translation',
+    ];
+}
+$columns[] = [
+    'class' => 'yii\grid\ActionColumn',
+    'template' => '{update}',
+];
 ?>
 <div class="term-index">
 
@@ -18,19 +32,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create Term', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'dict_id',
-
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
+        'columns' => $columns,
     ]); ?>
 
 

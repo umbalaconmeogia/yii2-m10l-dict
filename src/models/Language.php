@@ -14,7 +14,7 @@ use Yii;
  * 
  * @property Translation[] $translations
  */
-class Language extends \yii\db\ActiveRecord
+class Language extends BaseModel
 {
     /**
      * {@inheritdoc}

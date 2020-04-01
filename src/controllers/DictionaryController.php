@@ -5,30 +5,13 @@ namespace umbalaconmeogia\m10ldict\controllers;
 use Yii;
 use umbalaconmeogia\m10ldict\models\Dictionary;
 use umbalaconmeogia\m10ldict\models\DictionarySearch;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 
 /**
  * DictionaryController implements the CRUD actions for Dictionary model.
  */
-class DictionaryController extends Controller
+class DictionaryController extends BaseController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-
     /**
      * Lists all Dictionary models.
      * @return mixed

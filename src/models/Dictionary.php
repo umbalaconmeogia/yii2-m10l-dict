@@ -16,8 +16,10 @@ use yii\behaviors\TimestampBehavior;
  * @property int|null $created_by
  * @property int|null $updated_at
  * @property int|null $updated_by
+ * 
+ * @property Language[] $languages
  */
-class Dictionary extends \yii\db\ActiveRecord
+class Dictionary extends BaseModel
 {
     /**
      * {@inheritdoc}
@@ -54,6 +56,14 @@ class Dictionary extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
             'updated_by' => 'Updated By',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLanguages()
+    {
+        return $this->hasMany(Language::class, ['dict_id' => 'id']);
     }
 
     /**
